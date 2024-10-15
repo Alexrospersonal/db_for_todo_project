@@ -63,11 +63,11 @@ class TaskEntity {
   // }
 
   Future<Map<String, dynamic>> toJson() async {
-    var repeatedTask = await db?.repeatedTaskEntitys
+    var repeatedTask = await db.repeatedTaskEntitys
         .filter()
         .task((q) => q.idEqualTo(id))
         .findFirst();
-    var category = await db?.categoryEntitys
+    var category = await db.categoryEntitys
         .filter()
         .tasks((q) => q.idEqualTo(id))
         .findFirst();

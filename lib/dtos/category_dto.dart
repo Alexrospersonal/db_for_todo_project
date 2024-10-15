@@ -16,14 +16,22 @@ class CategoryDto {
     return CategoryDto(name: entity.name, emoji: entity.emoji);
   }
 
-  void _validateName() {
+  bool validateName() {
     if (name == null || name!.isEmpty) {
       throw Exception("Category name is required but was not provided.");
     }
+    return true;
+  }
+
+  bool validateEmoji() {
+    if (emoji == null) {
+      throw Exception("Category emoji is null");
+    }
+    return true;
   }
 
   String _getName() {
-    _validateName();
+    validateName();
     return name!;
   }
 

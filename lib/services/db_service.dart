@@ -15,7 +15,7 @@ const schemas = [
 class DbService {
   static final dbService = DbService._();
 
-  static Isar? _db;
+  static late Isar _db;
 
   static Future<void> initDb() async {
     final dir = await getApplicationDocumentsDirectory();
