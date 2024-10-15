@@ -8,8 +8,10 @@ class CategoryDto {
 
   CategoryEntity toEntity() {
     var name = _getName();
-    var emoji = _getEmoji();
-    return CategoryEntity(name: name, emoji: emoji);
+    if (emoji != null) {
+      return CategoryEntity(name: name, emoji: emoji!);
+    }
+    return CategoryEntity(name: name);
   }
 
   factory CategoryDto.fromEntity(CategoryEntity entity) {
@@ -33,9 +35,5 @@ class CategoryDto {
   String _getName() {
     validateName();
     return name!;
-  }
-
-  String _getEmoji() {
-    return emoji ?? "";
   }
 }
