@@ -1,6 +1,5 @@
 import 'package:db_for_todo_project/dtos/dtos_exports.dart';
 import 'package:db_for_todo_project/entities/entities_exports.dart';
-import 'package:db_for_todo_project/services/db_service.dart';
 import 'package:db_for_todo_project/services/log_service.dart';
 import 'package:isar/isar.dart';
 
@@ -13,14 +12,19 @@ abstract interface class ICategoryEntityService {
 }
 
 class CategoryEntityService implements ICategoryEntityService {
-  const CategoryEntityService();
+  final Isar db;
+  const CategoryEntityService({required this.db});
 
   @override
   Future<int> create(CategoryDto categoryDto) async {
     var newCategory = categoryDto.toEntity();
     try {
-      var id = await db.categoryEntitys.put(newCategory);
-      LogService.logger.i('Category created successfully with id: $id');
+      late int id;
+
+      await db.writeTxn(() async {
+        id = await db.categoryEntitys.put(newCategory);
+        LogService.logger.i('Category created successfully with id: $id');
+      });
       return id;
     } catch (e) {
       LogService.logger.e('Failed to create category: ', error: e);
