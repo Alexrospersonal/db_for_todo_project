@@ -1,5 +1,6 @@
 import 'package:db_for_todo_project/dtos/dtos_exports.dart';
 import 'package:db_for_todo_project/entities/entities_exports.dart';
+import 'package:db_for_todo_project/services/entity_services/base_entity_service.dart';
 import 'package:db_for_todo_project/services/log_service.dart';
 import 'package:isar/isar.dart';
 
@@ -11,7 +12,8 @@ abstract interface class ICategoryEntityService {
   Future<List<CategoryEntity>> getAll(int limit, int offset);
 }
 
-class CategoryEntityService implements ICategoryEntityService {
+class CategoryEntityService
+    implements ICategoryEntityService, BaseEntityService {
   final Isar db;
   const CategoryEntityService({required this.db});
 
