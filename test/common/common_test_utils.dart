@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:db_for_todo_project/services/log_service.dart';
+import 'package:db_for_todo_project/data/log_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 

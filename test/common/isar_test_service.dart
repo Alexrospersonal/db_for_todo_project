@@ -1,7 +1,7 @@
 import 'dart:ffi';
 
-import 'package:db_for_todo_project/services/entities_services_exports.dart';
-import 'package:db_for_todo_project/services/log_service.dart';
+import 'package:db_for_todo_project/data/services/entities_services_exports.dart';
+import 'package:db_for_todo_project/data/log_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
@@ -49,21 +49,25 @@ class IsarTestService<T extends BaseEntityService> {
     }
   }
 
-  Future<void> initIsarAndService(
-      EntityServiceFactory createEntityService) async {
+  Future<void> initIsar() async {
     testTempPath = getTestTempPath();
     prepareIsarTempEnvirement();
 
     db = await Isar.open(schemas, directory: testTempPath);
+  }
+
+  Future<void> initIsarAndService(
+      EntityServiceFactory createEntityService) async {
+    await initIsar();
     service = createEntityService(db);
   }
 
-  void closeIsarAndClearTempFolder() {
+  Future<void> closeIsarAndClearTempFolder() async {
     try {
-      db.close();
+      await db.close();
     } catch (e) {
       LogService.logger.e("Failed closing DB in test", error: e);
     }
-    clearFolder(testTempPath);
+    await clearFolder(testTempPath);
   }
 }

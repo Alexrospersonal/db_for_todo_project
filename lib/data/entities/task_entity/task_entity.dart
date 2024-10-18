@@ -1,4 +1,4 @@
-import 'package:db_for_todo_project/services/db_service.dart';
+import 'package:db_for_todo_project/data/services/db_service.dart';
 import 'package:isar/isar.dart';
 
 import '../entities_exports.dart';

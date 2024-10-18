@@ -1,19 +1,21 @@
-import 'package:db_for_todo_project/dtos/dtos_exports.dart';
-import 'package:db_for_todo_project/entities/entities_exports.dart';
-import 'package:db_for_todo_project/services/entity_services/base_entity_service.dart';
-import 'package:db_for_todo_project/services/log_service.dart';
+import 'package:db_for_todo_project/data/dtos/dtos_exports.dart';
+import 'package:db_for_todo_project/data/entities/entities_exports.dart';
+import 'package:db_for_todo_project/data/services/base_entity_service.dart';
+import 'package:db_for_todo_project/data/log_service.dart';
 import 'package:isar/isar.dart';
 
-abstract interface class ICategoryEntityService {
+abstract interface class ICategoryEntityService<U>
+    implements BaseEntityService {
+  ICategoryEntityService(U db);
   Future<int> create(CategoryDto categoryDto);
-  Future<void> update(int id, CategoryDto categoryDto);
+  Future<int> update(int id, CategoryDto categoryDto);
   Future<bool> delete(int id);
   Future<CategoryEntity?> getOne(int id);
   Future<List<CategoryEntity>> getAll(int limit, int offset);
 }
 
 class CategoryEntityService
-    implements ICategoryEntityService, BaseEntityService {
+    implements ICategoryEntityService<Isar>, BaseEntityService {
   final Isar db;
   const CategoryEntityService({required this.db});
 
@@ -37,7 +39,11 @@ class CategoryEntityService
   @override
   Future<bool> delete(int id) async {
     try {
-      var deletedId = await db.categoryEntitys.delete(id);
+      late bool deletedId;
+
+      await db.writeTxn(() async {
+        deletedId = await db.categoryEntitys.delete(id);
+      });
       LogService.logger.i('Category deleted successfully with id: $deletedId');
       return deletedId;
     } catch (e) {
@@ -78,7 +84,7 @@ class CategoryEntityService
   }
 
   @override
-  Future<void> update(int id, CategoryDto categoryDto) async {
+  Future<int> update(int id, CategoryDto categoryDto) async {
     try {
       var category = await db.categoryEntitys.get(id);
 
@@ -86,6 +92,8 @@ class CategoryEntityService
         LogService.logger.e("Category not found with id: $id");
         throw Exception("Category not found");
       }
+
+      late int updatedId;
 
       await db.writeTxn(() async {
         if (categoryDto.validateName()) {
@@ -95,9 +103,11 @@ class CategoryEntityService
         if (categoryDto.validateEmoji()) {
           category.emoji = categoryDto.emoji!;
         }
-        db.categoryEntitys.put(category);
+        updatedId = await db.categoryEntitys.put(category);
       });
+
       LogService.logger.i("Category updated successfully with id: $id");
+      return updatedId;
     } catch (e) {
       LogService.logger.e("Failed updating category with id: $id", error: e);
       throw Exception("Error updating category");

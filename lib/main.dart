@@ -1,6 +1,6 @@
-import 'package:db_for_todo_project/services/entities_services_exports.dart';
+import 'package:db_for_todo_project/data/services/entities_services_exports.dart';
 import 'package:flutter/material.dart';
-import '/entities/entities_exports.dart';
+import 'data/entities/entities_exports.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

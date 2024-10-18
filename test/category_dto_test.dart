@@ -1,4 +1,4 @@
-import 'package:db_for_todo_project/dtos/dtos_exports.dart';
+import 'package:db_for_todo_project/data/dtos/dtos_exports.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 

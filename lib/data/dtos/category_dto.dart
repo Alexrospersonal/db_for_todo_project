@@ -1,4 +1,4 @@
-import 'package:db_for_todo_project/entities/entities_exports.dart';
+import 'package:db_for_todo_project/data/entities/entities_exports.dart';
 
 class CategoryDto {
   String? name;
@@ -20,20 +20,22 @@ class CategoryDto {
 
   bool validateName() {
     if (name == null || name!.isEmpty) {
-      throw Exception("Category name is required but was not provided.");
+      return false;
     }
     return true;
   }
 
   bool validateEmoji() {
     if (emoji == null) {
-      throw Exception("Category emoji is null");
+      return false;
     }
     return true;
   }
 
   String _getName() {
-    validateName();
-    return name!;
+    if (validateName()) {
+      return name!;
+    }
+    throw Exception("Category name is required but was not provided.");
   }
 }
