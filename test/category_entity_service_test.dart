@@ -5,23 +5,7 @@ import 'package:isar/isar.dart';
 
 import 'common/isar_test_service.dart';
 
-// TODO: написати тести
 void main() async {
-  // var testTempPath = prepareIsarTempEnvirement();
-
-  // late Isar db;
-  // late CategoryEntityService categoryEntityService;
-
-  // setUp(() async {
-  //   db = await openTempIsar(schemas, testTempPath);
-  //   categoryEntityService = CategoryEntityService(db: db);
-  // });
-
-  // tearDownAll(() async {
-  //   serviceController.db.close();
-  //   clearFolder(testTempPath);
-  // });
-
   var serviceController = IsarTestService<ICategoryEntityService<Isar>>();
 
   group("Test CRUD CategoryService", () {

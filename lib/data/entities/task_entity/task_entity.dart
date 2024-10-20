@@ -42,36 +42,27 @@ class TaskEntity {
 
   TaskEntity({required this.title});
 
-  // TaskEntity copyWith(
-  //     {String? title,
-  //     String? notate,
-  //     DateTime? taskDate,
-  //     bool? hasTime,
-  //     bool? hasRepeats,
-  //     bool? important,
-  //     int? color}) {
-  //   var task = TaskEntity(title: title ?? this.title);
+  TaskEntity copyWith(
+      {String? title,
+      String? notate,
+      DateTime? taskDate,
+      bool? hasTime,
+      bool? hasRepeats,
+      bool? important,
+      int? color}) {
+    var task = TaskEntity(title: title ?? this.title);
 
-  //   task.notate = notate ?? this.notate;
-  //   task.taskDate = taskDate ?? this.taskDate;
-  //   task.hasTime = hasTime ?? this.hasTime;
-  //   task.hasRepeats = hasRepeats ?? this.hasRepeats;
-  //   task.important = important ?? this.important;
-  //   task.color = color ?? this.color;
+    task.notate = notate ?? this.notate;
+    task.taskDate = taskDate ?? this.taskDate;
+    task.hasTime = hasTime ?? this.hasTime;
+    task.hasRepeats = hasRepeats ?? this.hasRepeats;
+    task.important = important ?? this.important;
+    task.color = color ?? this.color;
 
-  //   return task;
-  // }
+    return task;
+  }
 
   Future<Map<String, dynamic>> toJson() async {
-    var repeatedTask = await db.repeatedTaskEntitys
-        .filter()
-        .task((q) => q.idEqualTo(id))
-        .findFirst();
-    var category = await db.categoryEntitys
-        .filter()
-        .tasks((q) => q.idEqualTo(id))
-        .findFirst();
-
     return {
       "id": id,
       "title": title,
@@ -79,10 +70,8 @@ class TaskEntity {
       "taskDate": taskDate,
       "hasTime": hasTime,
       "hasRepeats": hasRepeats,
-      "repeatsData": repeatedTask?.toJson(),
       "important": important,
       "color": color?.toInt(),
-      "category": category?.toJson()
     };
   }
 }
