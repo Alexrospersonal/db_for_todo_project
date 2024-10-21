@@ -7,7 +7,7 @@ import 'package:isar/isar.dart';
 abstract interface class ITaskEntityService<U> implements BaseEntityService {
   ITaskEntityService(U db);
   Future<int> create(TaskDto dto, int categoryId);
-  Future<int> update(int id, TaskDto dto, int newCategoryId);
+  Future<int> update(int id, TaskDto dto, [int? newCategoryId]);
   Future<bool> delete(int id);
   Future<TaskEntity?> getOne(int id);
   Future<List<TaskEntity>> getAll(int limit, int offset);
@@ -54,7 +54,9 @@ class TaskEntityService implements ITaskEntityService<Isar> {
     late bool result;
 
     try {
-      result = await db.taskEntitys.delete(id);
+      await db.writeTxn(() async {
+        result = await db.taskEntitys.delete(id);
+      });
     } catch (e) {
       LogService.logger.e("Failed to delete task with id: $id", error: e);
       throw Exception("Error deleting task");
@@ -93,7 +95,7 @@ class TaskEntityService implements ITaskEntityService<Isar> {
   }
 
   @override
-  Future<int> update(int id, TaskDto dto, int? newCategoryId) async {
+  Future<int> update(int id, TaskDto dto, [int? newCategoryId]) async {
     late int updatedId;
 
     try {
@@ -109,6 +111,17 @@ class TaskEntityService implements ITaskEntityService<Isar> {
       if (newCategoryId != null) {
         newCategory = await categoryService.getOne(id);
       }
+
+      task.title = dto.title ?? task.title;
+      task.notate = dto.notate ?? task.notate;
+      task.taskDate = dto.taskDate ?? task.taskDate;
+      task.hasTime = dto.hasTime ?? task.hasTime;
+      task.isFinished = dto.isFinished ?? task.isFinished;
+      task.hasRepeats = dto.hasRepeats ?? task.hasRepeats;
+      task.important = dto.important ?? task.important;
+      task.isCopy = dto.isCopy ?? task.isCopy;
+      task.color = dto.color ?? task.color;
+      task.notificationId = dto.notificationId ?? task.notificationId;
 
       await db.writeTxn(() async {
         if (newCategory != null) {

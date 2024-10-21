@@ -2,7 +2,7 @@ import 'package:db_for_todo_project/data/entities/task_entity/task_entity.dart';
 
 // TODO: vaildate title
 class TaskDto {
-  String title;
+  String? title;
   String? notate;
   DateTime? taskDate;
   int? color;
@@ -14,7 +14,7 @@ class TaskDto {
   bool? isFinished = false;
 
   TaskDto({
-    required this.title,
+    this.title,
     this.notate,
     this.taskDate,
     this.color,
@@ -28,14 +28,15 @@ class TaskDto {
     validateTitle(title);
   }
 
-  void validateTitle(String title) {
-    if (title.isEmpty) {
+  void validateTitle(String? title) {
+    if (title == null || title.isEmpty) {
       throw Exception("Title cannot be empty");
     }
   }
 
   TaskEntity toEntity() {
-    var taskEntity = TaskEntity(title: title);
+    validateTitle(title);
+    var taskEntity = TaskEntity(title: title!);
 
     return taskEntity.copyWith(
         notate: notate,
