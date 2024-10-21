@@ -39,13 +39,13 @@ class CategoryEntityService
   @override
   Future<bool> delete(int id) async {
     try {
-      late bool deletedId;
+      late bool result;
 
       await db.writeTxn(() async {
-        deletedId = await db.categoryEntitys.delete(id);
+        result = await db.categoryEntitys.delete(id);
       });
-      LogService.logger.i('Category deleted successfully with id: $deletedId');
-      return deletedId;
+      LogService.logger.i('Category deleted successfully with id: $result');
+      return result;
     } catch (e) {
       LogService.logger.e('Failed to deleting category: ', error: e);
       throw Exception("Error deleting category");
