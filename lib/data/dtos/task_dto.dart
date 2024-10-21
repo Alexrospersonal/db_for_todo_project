@@ -4,40 +4,93 @@ import 'package:db_for_todo_project/data/entities/task_entity/task_entity.dart';
 class TaskDto {
   String title;
   String? notate;
-  bool? important;
-  int? categoryId;
   DateTime? taskDate;
-  bool? hasTime;
   int? color;
-  bool? hasRepeats;
-  int? repeatedTaskId;
-  bool? isFinished;
-  bool? isCopy;
-  int? originalId;
   int? notificationId;
+  bool? isCopy = false;
+  bool? hasTime = false;
+  bool? hasRepeats = false;
+  bool? important = false;
+  bool? isFinished = false;
 
-  TaskDto({required this.title});
+  TaskDto({
+    required this.title,
+    this.notate,
+    this.taskDate,
+    this.color,
+    this.notificationId,
+    this.isCopy,
+    this.hasTime,
+    this.hasRepeats,
+    this.important,
+    this.isFinished,
+  }) {
+    validateTitle(title);
+  }
+
+  void validateTitle(String title) {
+    if (title.isEmpty) {
+      throw Exception("Title cannot be empty");
+    }
+  }
+
+  TaskEntity toEntity() {
+    var taskEntity = TaskEntity(title: title);
+
+    return taskEntity.copyWith(
+        notate: notate,
+        color: color,
+        important: important,
+        isFinished: isFinished,
+        taskDate: taskDate,
+        hasRepeats: hasRepeats,
+        hasTime: hasTime,
+        isCopy: isCopy,
+        notificationId: notificationId);
+  }
+
+  TaskDto copyWith({
+    String? title,
+    String? notate,
+    DateTime? taskDate,
+    int? color,
+    bool? isFinished,
+    int? notificationId,
+    bool? isCopy,
+    bool? hasTime,
+    bool? hasRepeats,
+    bool? important,
+  }) {
+    var dto = TaskDto(title: title ?? this.title);
+
+    dto.notate = notate ?? this.notate;
+    dto.color = color ?? this.color;
+    dto.important = important ?? this.important;
+    dto.isFinished = isFinished ?? this.isFinished;
+
+    dto.taskDate = taskDate ?? this.taskDate;
+    dto.hasRepeats = hasRepeats ?? this.hasRepeats;
+    dto.hasTime = hasTime ?? this.hasTime;
+
+    dto.isCopy = isCopy ?? this.isCopy;
+
+    dto.notificationId = notificationId ?? this.notificationId;
+
+    return dto;
+  }
 
   factory TaskDto.fromEntity(TaskEntity entity) {
-    var dto = TaskDto(title: entity.title);
-    entity.category.loadSync();
-    entity.originalTask.loadSync();
-    entity.repeatedTask.loadSync();
-
-    dto.notate = entity.notate;
-    dto.color = entity.color;
-    dto.important = entity.important;
-
-    dto.taskDate = entity.taskDate;
-    dto.hasRepeats = entity.hasRepeats;
-    dto.hasTime = entity.hasTime;
-
-    dto.isCopy = entity.isCopy;
-
-    dto.notificationId = entity.notificationId;
-    dto.categoryId = entity.category.value?.id;
-    dto.originalId = entity.originalTask.value?.id;
-    dto.repeatedTaskId = entity.repeatedTask.value?.id;
-    return dto;
+    return TaskDto(
+      title: entity.title,
+      notate: entity.notate,
+      color: entity.color,
+      important: entity.important,
+      isFinished: entity.isFinished,
+      taskDate: entity.taskDate,
+      hasRepeats: entity.hasRepeats,
+      hasTime: entity.hasTime,
+      isCopy: entity.isCopy,
+      notificationId: entity.notificationId,
+    );
   }
 }

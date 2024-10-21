@@ -46,9 +46,12 @@ class TaskEntity {
       String? notate,
       DateTime? taskDate,
       bool? hasTime,
+      bool? isFinished,
       bool? hasRepeats,
       bool? important,
-      int? color}) {
+      bool? isCopy,
+      int? color,
+      int? notificationId}) {
     var task = TaskEntity(title: title ?? this.title);
 
     task.notate = notate ?? this.notate;
@@ -56,7 +59,10 @@ class TaskEntity {
     task.hasTime = hasTime ?? this.hasTime;
     task.hasRepeats = hasRepeats ?? this.hasRepeats;
     task.important = important ?? this.important;
+    task.isFinished = isFinished ?? this.isFinished;
     task.color = color ?? this.color;
+    task.isCopy = isCopy ?? this.isCopy;
+    task.notificationId = notificationId ?? this.notificationId;
 
     return task;
   }
