@@ -72,7 +72,7 @@ class TaskEntity {
       "id": id,
       "title": title,
       "notate": notate,
-      "taskDate": taskDate,
+      "taskDate": taskDate?.toIso8601String(),
       "hasTime": hasTime,
       "hasRepeats": hasRepeats,
       "important": important,
