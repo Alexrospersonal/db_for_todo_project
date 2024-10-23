@@ -67,7 +67,7 @@ class TaskEntity {
     return task;
   }
 
-  Future<Map<String, dynamic>> toJson() async {
+  Map<String, dynamic> toJson() {
     return {
       "id": id,
       "title": title,

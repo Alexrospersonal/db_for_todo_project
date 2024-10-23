@@ -7,8 +7,6 @@ import 'package:test/scaffolding.dart';
 
 import '../common/isar_test_service.dart';
 
-// TODO: create repeated task with task
-// TODO test toJson
 void main() {
   var serviceController = IsarTestService<BaseEntityService<Isar>>();
 

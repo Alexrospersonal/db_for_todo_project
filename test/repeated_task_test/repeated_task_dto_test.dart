@@ -1,6 +1,5 @@
 import 'package:db_for_todo_project/data/dtos/dtos_exports.dart';
 import 'package:db_for_todo_project/data/entities/entities_exports.dart';
-import 'package:db_for_todo_project/data/entities/task_entity/task_entity.dart';
 import 'package:db_for_todo_project/data/services/entities_services_exports.dart';
 import 'package:isar/isar.dart';
 import 'package:test/expect.dart';
@@ -9,18 +8,11 @@ import 'package:test/scaffolding.dart';
 import '../common/isar_test_service.dart';
 
 void main() {
-  // TODO: create test
-// TODO: fromEntity
-// TODO: toEntity
-
   group("Test repeated task dto", () {
     var serviceController = IsarTestService<BaseEntityService<Isar>>();
 
-    late Isar db;
-
     setUpAll(() async {
       await serviceController.initIsar();
-      db = serviceController.db;
     });
 
     test("Should create a repeatedTaskDto", () async {
@@ -39,7 +31,6 @@ void main() {
       expect(repeatedTaskDto.repeatDuringDay, isNull);
     });
 
-    // TODO: не присвоюється таска до повторів
     test("Should return task repeated dto from Entity", () async {
       var entity = RepeatedTaskEntity();
 

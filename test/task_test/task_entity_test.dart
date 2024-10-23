@@ -48,7 +48,7 @@ void main() {
       var titleForTask = "Task 1";
       var task = createBaseTaskEntity(titleForTask);
 
-      var jsonObject = await task.toJson();
+      var jsonObject = task.toJson();
 
       expect(jsonObject["title"], titleForTask);
     });
