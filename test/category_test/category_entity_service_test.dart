@@ -3,7 +3,7 @@ import 'package:db_for_todo_project/data/services/entities_services_exports.dart
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 
-import 'common/isar_test_service.dart';
+import '../common/isar_test_service.dart';
 
 void main() async {
   var serviceController = IsarTestService<ICategoryEntityService<Isar>>();

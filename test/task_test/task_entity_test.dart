@@ -4,14 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:isar/isar.dart';
 
-import 'common/isar_test_service.dart';
+import '../common/isar_test_service.dart';
 
 void main() {
   var serviceController = IsarTestService<BaseEntityService<Isar>>();
 
-  // TODO: to Json
-  // TODO: from Json
-  //
   group("Test Task Entity", () {
     late Isar db;
 

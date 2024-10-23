@@ -8,7 +8,7 @@ import 'package:isar/isar.dart';
 import 'package:test/expect.dart';
 import 'package:test/scaffolding.dart';
 
-import 'common/isar_test_service.dart';
+import '../common/isar_test_service.dart';
 
 void main() {
   var serviceController = IsarTestService<ITaskEntityService<Isar>>();

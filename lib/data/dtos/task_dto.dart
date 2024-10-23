@@ -1,6 +1,5 @@
 import 'package:db_for_todo_project/data/entities/task_entity/task_entity.dart';
 
-// TODO: vaildate title
 class TaskDto {
   String? title;
   String? notate;
