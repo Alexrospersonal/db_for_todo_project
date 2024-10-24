@@ -87,6 +87,7 @@ ArchivedTaskEntity _archivedTaskEntityDeserialize(
     originalId: reader.readLong(offsets[2]),
     taskData: reader.readString(offsets[3]),
   );
+  object.id = id;
   return object;
 }
 
@@ -120,7 +121,9 @@ List<IsarLinkBase<dynamic>> _archivedTaskEntityGetLinks(
 }
 
 void _archivedTaskEntityAttach(
-    IsarCollection<dynamic> col, Id id, ArchivedTaskEntity object) {}
+    IsarCollection<dynamic> col, Id id, ArchivedTaskEntity object) {
+  object.id = id;
+}
 
 extension ArchivedTaskEntityQueryWhereSort
     on QueryBuilder<ArchivedTaskEntity, ArchivedTaskEntity, QWhere> {

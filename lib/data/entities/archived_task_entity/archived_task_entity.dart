@@ -4,13 +4,13 @@ part 'archived_task_entity.g.dart';
 
 @collection
 class ArchivedTaskEntity {
-  final Id id = Isar.autoIncrement;
-  final int originalId;
-  final String taskData;
-  final DateTime finishedDate;
-  final bool isFinished;
+  Id id = Isar.autoIncrement;
+  int originalId;
+  String taskData;
+  DateTime finishedDate;
+  bool isFinished;
 
-  const ArchivedTaskEntity({
+  ArchivedTaskEntity({
     required this.originalId,
     required this.taskData,
     required this.finishedDate,

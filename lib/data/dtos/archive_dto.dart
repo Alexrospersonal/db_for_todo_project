@@ -1,16 +1,13 @@
 import 'package:db_for_todo_project/data/entities/entities_exports.dart';
 
 class ArchiveDto {
-  final int originalId;
-  final String taskData;
-  final DateTime finishedDate;
-  final bool isFinished;
+  int? originalId;
+  String? taskData;
+  DateTime? finishedDate;
+  bool? isFinished;
 
   ArchiveDto(
-      {required this.originalId,
-      required this.finishedDate,
-      required this.isFinished,
-      required this.taskData});
+      {this.originalId, this.finishedDate, this.isFinished, this.taskData});
 
   factory ArchiveDto.fromEntity(ArchivedTaskEntity archive) {
     return ArchiveDto(
@@ -21,10 +18,17 @@ class ArchiveDto {
   }
 
   ArchivedTaskEntity toEntity() {
+    var validateRes =
+        [originalId, taskData, finishedDate].any((element) => element == null);
+
+    if (validateRes) {
+      throw Exception("One of fields is null");
+    }
+
     return ArchivedTaskEntity(
-        originalId: originalId,
-        taskData: taskData,
-        finishedDate: finishedDate,
-        isFinished: isFinished);
+        originalId: originalId!,
+        taskData: taskData!,
+        finishedDate: finishedDate!,
+        isFinished: isFinished ?? false);
   }
 }
