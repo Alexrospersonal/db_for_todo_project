@@ -15,6 +15,10 @@ void main() {
       await serviceController.initIsar();
     });
 
+    tearDownAll(() async {
+      await serviceController.closeIsarAndClearTempFolder();
+    });
+
     test("Should create a repeatedTaskDto", () async {
       var repeatedTaskDto = RepeatedTaskDto(
           repeatDuringWeek: [1, 3, 5],
