@@ -18,30 +18,30 @@ void main() {
       await serviceController.closeIsarAndClearTempFolder();
     });
 
-    test("Should create finished DTO", () {
-      var finishedDate = DateTime.now();
-      var dto = FinishedTaskDto(finishedDate: finishedDate);
+    test("Should create overdue DTO", () {
+      var overdueDate = DateTime.now();
+      var dto = OverdueTaskDto(overdueDate: overdueDate);
 
-      expect(dto.finishedDate, finishedDate);
+      expect(dto.overdueDate, overdueDate);
       expect(dto.task, isNull);
     });
 
-    test("Should return FinishedEntity", () {
-      var finishedDate = DateTime.now();
-      var dto = FinishedTaskDto(finishedDate: finishedDate);
+    test("Should return OverdueEntity", () {
+      var overdue = DateTime.now();
+      var dto = OverdueTaskDto(overdueDate: overdue);
       var entity = dto.toEntity();
 
-      expect(entity.finishedDate, dto.finishedDate);
+      expect(entity.overdueDate, dto.overdueDate);
       expect(entity.task.value, dto.task);
     });
 
     test("Should return DTO from entity", () async {
-      var finishedDate = DateTime.now();
+      var overdueDate = DateTime.now();
 
-      var entity = FinishedTaskEntity(finishedDate: finishedDate);
-      var dto = FinishedTaskDto.fromEntity(entity);
+      var entity = OverdueTaskEntity(overdueDate: overdueDate);
+      var dto = OverdueTaskDto.fromEntity(entity);
 
-      expect(entity.finishedDate, dto.finishedDate);
+      expect(entity.overdueDate, dto.overdueDate);
       expect(entity.task.value, dto.task);
     });
   });
