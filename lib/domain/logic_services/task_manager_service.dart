@@ -3,6 +3,7 @@ import 'package:db_for_todo_project/data/entities/entities_exports.dart';
 import 'package:db_for_todo_project/domain/logic_services/logic_services_exports.dart';
 import 'package:db_for_todo_project/data/services/entities_services_exports.dart';
 import 'package:db_for_todo_project/domain/utilities/common.dart';
+import 'package:flutter/foundation.dart';
 
 abstract interface class ITaskManagerService<T, U> {
   Future<void> buildTask(T taskDto, U? repeatedDto, int categoryId);
@@ -26,12 +27,12 @@ class TaskManagerService
     if (repeatedDto != null) {
       await buildRepeatedTask(taskDto, repeatedDto, categoryId);
     }
-    await _buildSimpleTask(taskDto, categoryId);
+    await buildSimpleTask(taskDto, categoryId);
   }
 
   Future<void> buildRepeatedTask(
       TaskDto taskDto, RepeatedTaskDto repeatedDto, int categoryId) async {
-    var copiesTask = _createCopies(taskDto, repeatedDto, categoryId);
+    var copiesTask = createCopies(taskDto, repeatedDto, categoryId);
 
     await db.writeTxn(() async {
       var taskId = await taskService.createInternal(taskDto, categoryId);
@@ -60,7 +61,7 @@ class TaskManagerService
     // Call NotificationService and create notification
   }
 
-  List<TaskEntity> _createCopies(
+  List<TaskEntity> createCopies(
       TaskDto taskDto, RepeatedTaskDto repeatedDto, int categoryId) {
     var weekdaysRepeat = repeatedDto.repeatDuringWeek!;
     var nextDate = dateManager.getNextDate(weekdaysRepeat, taskDto.taskDate!);
@@ -68,26 +69,26 @@ class TaskManagerService
     var times = dateManager.filterNonNullTimes(repeatedDto.repeatDuringDay!);
 
     if (times.isNotEmpty) {
-      return _getCopiesOfTask(times, nextDate, taskDto);
+      return getCopiesOfTask(times, nextDate, taskDto);
     }
 
     var date = dateManager.joinDateAndTime(nextDate, taskDto.taskDate!);
-    return [_createCopyOfTask(date, taskDto)];
+    return [createCopyOfTask(date, taskDto)];
   }
 
-  List<TaskEntity> _getCopiesOfTask(
+  List<TaskEntity> getCopiesOfTask(
       List<DateTime?> times, DateTime nextDate, TaskDto taskDto) {
     List<TaskEntity> copies = [];
 
     for (var time in times) {
       var newDateTime = dateManager.joinDateAndTime(nextDate, time!);
-      var task = _createCopyOfTask(newDateTime, taskDto);
+      var task = createCopyOfTask(newDateTime, taskDto);
       copies.add(task);
     }
     return copies;
   }
 
-  TaskEntity _createCopyOfTask(DateTime dateWithTime, TaskDto taskDto) {
+  TaskEntity createCopyOfTask(DateTime dateWithTime, TaskDto taskDto) {
     var task = taskDto.toEntity();
     var copiestTask = task.copyWith(taskDate: dateWithTime);
     copiestTask.isCopy = true;
@@ -97,8 +98,9 @@ class TaskManagerService
     return copiestTask;
   }
 
-  Future<void> _buildSimpleTask(TaskDto taskDto, int categoryId) async {
+  @visibleForTesting
+  Future<int> buildSimpleTask(TaskDto taskDto, int categoryId) async {
     taskDto.notificationId = getRandomNotificationId();
-    await taskService.create(taskDto, categoryId);
+    return await taskService.create(taskDto, categoryId);
   }
 }
