@@ -65,7 +65,7 @@ class TaskManagerService
     var weekdaysRepeat = repeatedDto.repeatDuringWeek!;
     var nextDate = dateManager.getNextDate(weekdaysRepeat, taskDto.taskDate!);
 
-    var times = dateManager.getTimes(repeatedDto.repeatDuringDay!);
+    var times = dateManager.filterNonNullTimes(repeatedDto.repeatDuringDay!);
 
     if (times.isNotEmpty) {
       return _getCopiesOfTask(times, nextDate, taskDto);

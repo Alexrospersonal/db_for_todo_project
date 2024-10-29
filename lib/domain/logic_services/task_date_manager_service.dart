@@ -6,9 +6,10 @@ class TaskDateManagerService {
 
     int closestDay = getClosestDay(weekdays, startDateInWeek);
 
-    late int addDaysToDate = getAddDaysToDate(startDateInWeek, closestDay);
+    late int addDaysToDate =
+        calculateDaysUntilNextDay(startDateInWeek, closestDay);
 
-    return DateTime.now().add(Duration(days: addDaysToDate));
+    return startDate.add(Duration(days: addDaysToDate));
   }
 
   int getClosestDay(List<int> weekdays, int startDateInWeek) {
@@ -16,14 +17,14 @@ class TaskDateManagerService {
         orElse: () => weekdays[0]);
   }
 
-  int getAddDaysToDate(int startDateInWeek, int closesetDay) {
+  int calculateDaysUntilNextDay(int startDateInWeek, int closesetDay) {
     int addDaysToDate = 0;
 
     switch (startDateInWeek.compareTo(closesetDay)) {
       case 0:
         addDaysToDate = 0;
       case 1:
-        addDaysToDate = ((startDateInWeek + closesetDay) % 7) + 1;
+        addDaysToDate = (7 - startDateInWeek) + closesetDay;
       case -1:
         addDaysToDate = closesetDay - startDateInWeek;
     }
@@ -31,7 +32,7 @@ class TaskDateManagerService {
     return addDaysToDate;
   }
 
-  List<DateTime?> getTimes(List<DateTime?> repeatDuringDay) {
+  List<DateTime?> filterNonNullTimes(List<DateTime?> repeatDuringDay) {
     return repeatDuringDay.where((time) => time != null).toList();
   }
 
