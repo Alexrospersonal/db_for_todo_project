@@ -43,10 +43,7 @@ void main() {
           ],
           isFinished: false);
 
-      var task =
-          await TaskEntityService(db: serviceController.db).getOne(taskId);
-
-      var repeatedTaskId = await service.create(dto, task!);
+      var repeatedTaskId = await service.create(dto, taskId);
       var repeatedTask =
           await serviceController.db.repeatedTaskEntitys.get(repeatedTaskId);
 
@@ -141,10 +138,7 @@ void main() {
             ],
             isFinished: false);
 
-        var task =
-            await TaskEntityService(db: serviceController.db).getOne(taskId);
-
-        await service.create(dto, task!);
+        await service.create(dto, taskId);
       }
 
       var repeatedTasks = await service.getAll(10, 0);

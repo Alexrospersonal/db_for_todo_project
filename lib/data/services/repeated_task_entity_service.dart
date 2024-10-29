@@ -7,7 +7,8 @@ import 'package:isar/isar.dart';
 abstract interface class IRepeatedTaskEntityService<U>
     implements BaseEntityService {
   IRepeatedTaskEntityService(U db);
-  Future<int> create(RepeatedTaskDto dto, TaskEntity task);
+  Future<int> create(RepeatedTaskDto dto, int taskId);
+  Future<int> createInternal(RepeatedTaskDto dto, int taskId);
   Future<int> update(int id, RepeatedTaskDto dto);
   Future<bool> delete(int id);
   Future<RepeatedTaskEntity?> getOne(int id);
@@ -15,21 +16,19 @@ abstract interface class IRepeatedTaskEntityService<U>
 }
 
 class RepeatedTaskEntityService implements IRepeatedTaskEntityService<Isar> {
+  late TaskEntityService taskService;
   final Isar db;
 
-  RepeatedTaskEntityService({required this.db});
+  RepeatedTaskEntityService({required this.db})
+      : taskService = TaskEntityService(db: db);
 
   @override
-  Future<int> create(RepeatedTaskDto dto, TaskEntity task) async {
-    var repeatedTaskEntity = dto.toEntity();
-    repeatedTaskEntity.task.value = task;
-
+  Future<int> create(RepeatedTaskDto dto, int taskId) async {
     late int createdId;
 
     try {
       await db.writeTxn(() async {
-        createdId = await db.repeatedTaskEntitys.put(repeatedTaskEntity);
-        await repeatedTaskEntity.task.save();
+        createdId = await createInternal(dto, taskId);
       });
     } catch (e, stackTrace) {
       LogService.logger.e("Failed to create repeated task",
@@ -39,6 +38,19 @@ class RepeatedTaskEntityService implements IRepeatedTaskEntityService<Isar> {
 
     LogService.logger
         .i("Repeated task created successfully with id: $createdId");
+    return createdId;
+  }
+
+  @override
+  Future<int> createInternal(RepeatedTaskDto dto, int taskId) async {
+    var repeatedTask = dto.toEntity();
+
+    var task = await taskService.getOne(taskId);
+
+    repeatedTask.task.value = task;
+    var createdId = await db.repeatedTaskEntitys.put(repeatedTask);
+    await repeatedTask.task.save();
+
     return createdId;
   }
 

@@ -7,12 +7,16 @@ import 'package:isar/isar.dart';
 abstract interface class ITaskEntityService<U> implements BaseEntityService {
   ITaskEntityService(U db);
   Future<int> create(TaskDto dto, int categoryId);
+  Future<int> createInternal(TaskDto dto, int categoryId);
+  Future<List<int>> saveAll(List<TaskEntity> tasks);
+  Future<List<int>> saveAllInternal(List<TaskEntity> tasks);
   Future<int> update(int id, TaskDto dto, [int? newCategoryId]);
   Future<bool> delete(int id);
   Future<TaskEntity?> getOne(int id);
   Future<List<TaskEntity>> getAll(int limit, int offset);
 }
 
+/// Internal methods should using only in transaction
 class TaskEntityService implements ITaskEntityService<Isar> {
   late CategoryEntityService categoryService;
   final Isar db;
@@ -22,6 +26,23 @@ class TaskEntityService implements ITaskEntityService<Isar> {
 
   @override
   Future<int> create(TaskDto dto, int categoryId) async {
+    late int createdId;
+
+    try {
+      await db.writeTxn(() async {
+        createdId = await createInternal(dto, categoryId);
+      });
+    } catch (e) {
+      LogService.logger.e("Failed to create task", error: e);
+      throw Exception("Error creating task");
+    }
+    LogService.logger.i("Task created successfully with id: $createdId");
+
+    return createdId;
+  }
+
+  @override
+  Future<int> createInternal(TaskDto dto, int categoryId) async {
     var task = dto.toEntity();
 
     var category = await categoryService.getOne(categoryId);
@@ -32,20 +53,8 @@ class TaskEntityService implements ITaskEntityService<Isar> {
     }
 
     task.category.value = category;
-
-    late int createdId;
-
-    try {
-      await db.writeTxn(() async {
-        createdId = await db.taskEntitys.put(task);
-        await task.category.save();
-      });
-    } catch (e) {
-      LogService.logger.e("Failed to create task", error: e);
-      throw Exception("Error creating task");
-    }
-    LogService.logger.i("Task created successfully with id: $createdId");
-
+    var createdId = await db.taskEntitys.put(task);
+    await task.category.save();
     return createdId;
   }
 
@@ -137,5 +146,27 @@ class TaskEntityService implements ITaskEntityService<Isar> {
     }
     LogService.logger.i("Task updated successfully with id: $id");
     return updatedId;
+  }
+
+  @override
+  Future<List<int>> saveAll(List<TaskEntity> tasks) async {
+    late List<int> createdIds;
+
+    try {
+      await db.writeTxn(() async {
+        createdIds = await saveAllInternal(tasks);
+      });
+    } catch (e) {
+      LogService.logger.e("Failed save all tasks", error: e);
+      throw Exception("Error saving tasks");
+    }
+    LogService.logger.i("All tasks created successfully");
+
+    return createdIds;
+  }
+
+  @override
+  Future<List<int>> saveAllInternal(List<TaskEntity> tasks) async {
+    return await db.taskEntitys.putAll(tasks);
   }
 }
