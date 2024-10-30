@@ -32,7 +32,10 @@ class TaskDateManagerService {
     return addDaysToDate;
   }
 
-  List<DateTime?> filterNonNullTimes(List<DateTime?> repeatDuringDay) {
+  List<DateTime?> filterNonNullTimes(List<DateTime?>? repeatDuringDay) {
+    if (repeatDuringDay == null) {
+      return <DateTime?>[];
+    }
     return repeatDuringDay.where((time) => time != null).toList();
   }
 
