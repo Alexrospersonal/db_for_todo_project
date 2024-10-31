@@ -6,12 +6,12 @@ import 'package:db_for_todo_project/domain/utilities/common.dart';
 import 'package:flutter/foundation.dart';
 import 'package:isar/isar.dart';
 
-abstract interface class ITaskManagerService<T, U> {
+abstract interface class ITaskCreationService<T, U> {
   Future<void> buildTask(T taskDto, U? repeatedDto, int categoryId);
 }
 
 class TaskCreationService
-    implements ITaskManagerService<TaskDto, RepeatedTaskDto> {
+    implements ITaskCreationService<TaskDto, RepeatedTaskDto> {
   final Isar db;
   final ITaskEntityService taskService;
   final IRepeatedTaskEntityService repeatedTaskService;
@@ -50,11 +50,11 @@ class TaskCreationService
       var category = await categoryService.getOne(categoryId);
       var repeated = await repeatedTaskService.getOne(repeatId);
 
-      _addEntitiesToLinks(copiesTask, category!, task!, repeated!);
+      addEntitiesToLinks(copiesTask, category!, task!, repeated!);
 
       copiesIdList = await taskService.saveAllInternal(copiesTask);
 
-      await _saveCopiesLinks(copiesTask);
+      await saveCopiesLinks(copiesTask);
     });
 
     // TODO: add notifications to copies or original
@@ -62,7 +62,7 @@ class TaskCreationService
     return <String, dynamic>{'original': taskId, 'copies': copiesIdList};
   }
 
-  void _addEntitiesToLinks(List<TaskEntity> copiesTask, CategoryEntity category,
+  void addEntitiesToLinks(List<TaskEntity> copiesTask, CategoryEntity category,
       TaskEntity task, RepeatedTaskEntity repeated) {
     for (var copy in copiesTask) {
       copy.category.value = category;
@@ -71,7 +71,7 @@ class TaskCreationService
     }
   }
 
-  Future<void> _saveCopiesLinks(List<TaskEntity> copiesTask) async {
+  Future<void> saveCopiesLinks(List<TaskEntity> copiesTask) async {
     for (var copy in copiesTask) {
       await copy.category.save();
       await copy.originalTask.save();
