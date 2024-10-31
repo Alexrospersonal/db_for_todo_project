@@ -10,7 +10,7 @@ abstract interface class ITaskManagerService<T, U> {
   Future<void> buildTask(T taskDto, U? repeatedDto, int categoryId);
 }
 
-class TaskManagerService
+class TaskCreationService
     implements ITaskManagerService<TaskDto, RepeatedTaskDto> {
   final Isar db;
   final ITaskEntityService taskService;
@@ -18,7 +18,7 @@ class TaskManagerService
   final ICategoryEntityService categoryService;
   final TaskDateManagerService dateManager = const TaskDateManagerService();
 
-  const TaskManagerService(
+  const TaskCreationService(
       {required this.db,
       required this.taskService,
       required this.categoryService,
@@ -50,27 +50,33 @@ class TaskManagerService
       var category = await categoryService.getOne(categoryId);
       var repeated = await repeatedTaskService.getOne(repeatId);
 
-      // Add category and original to copies tasks before saving
-      for (var copy in copiesTask) {
-        copy.category.value = category;
-        copy.originalTask.value = task;
-        copy.repeatedTask.value = repeated;
-      }
+      _addEntitiesToLinks(copiesTask, category!, task!, repeated!);
 
       copiesIdList = await taskService.saveAllInternal(copiesTask);
 
-      // Invoke save in category and original task for copiest tasks
-      for (var copy in copiesTask) {
-        await copy.category.save();
-        await copy.originalTask.save();
-        await copy.repeatedTask.save();
-      }
+      await _saveCopiesLinks(copiesTask);
     });
 
     // TODO: add notifications to copies or original
     // Call NotificationService and create notification
-
     return <String, dynamic>{'original': taskId, 'copies': copiesIdList};
+  }
+
+  void _addEntitiesToLinks(List<TaskEntity> copiesTask, CategoryEntity category,
+      TaskEntity task, RepeatedTaskEntity repeated) {
+    for (var copy in copiesTask) {
+      copy.category.value = category;
+      copy.originalTask.value = task;
+      copy.repeatedTask.value = repeated;
+    }
+  }
+
+  Future<void> _saveCopiesLinks(List<TaskEntity> copiesTask) async {
+    for (var copy in copiesTask) {
+      await copy.category.save();
+      await copy.originalTask.save();
+      await copy.repeatedTask.save();
+    }
   }
 
   List<TaskEntity> buildTaskCopies(

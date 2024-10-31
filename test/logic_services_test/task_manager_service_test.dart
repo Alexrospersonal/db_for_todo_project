@@ -11,7 +11,7 @@ import '../common/isar_test_service.dart';
 void main() {
   group("Test Task Manager Service, testing all functions", () {
     var serviceController = IsarTestService<BaseEntityService<Isar>>();
-    late TaskManagerService taskManager;
+    late TaskCreationService taskManager;
     late Isar isar;
     late int categoryId;
 
@@ -19,7 +19,7 @@ void main() {
       await serviceController.initIsar();
       isar = serviceController.db;
 
-      taskManager = TaskManagerService(
+      taskManager = TaskCreationService(
           db: isar,
           taskService: TaskEntityService(db: isar),
           repeatedTaskService: RepeatedTaskEntityService(db: isar),
