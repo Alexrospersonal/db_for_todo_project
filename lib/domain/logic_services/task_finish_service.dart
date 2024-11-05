@@ -7,6 +7,7 @@ abstract interface class ITaskFinishService<U> {
   Future<int> finishTask(int taskId);
 }
 
+// TODO: add finished task to finisshed table
 class TaskFinishService implements ITaskFinishService<Isar> {
   @override
   final Isar db;
@@ -83,6 +84,7 @@ class TaskFinishService implements ITaskFinishService<Isar> {
       } else {
         updatedId = await db.taskEntitys.put(task);
       }
+      await addTaskToFinishedEntity(task);
     });
 
     return updatedId;
@@ -94,8 +96,16 @@ class TaskFinishService implements ITaskFinishService<Isar> {
     task.isFinished = true;
     await db.writeTxn(() async {
       updatedId = await db.taskEntitys.put(task);
+      await addTaskToFinishedEntity(task);
     });
 
     return updatedId;
+  }
+
+  Future<void> addTaskToFinishedEntity(TaskEntity task) async {
+    var entity = FinishedTaskEntity(finishedDate: DateTime.now());
+    entity.task.value = task;
+    await db.finishedTaskEntitys.put(entity);
+    await entity.task.save();
   }
 }
