@@ -27,7 +27,7 @@ void main() {
       });
 
       await db.writeTxn(() async {
-        var date = DateTime(2024, 10, 31, 0, 0, 0);
+        var date = DateTime(2024, 11, 1, 0, 0, 0);
 
         var category = await db.categoryEntitys.get(categoryId);
         var task = TaskEntity(title: "Test find and create 1");
@@ -35,7 +35,7 @@ void main() {
         task.category.value = category;
 
         var repeatedTask = RepeatedTaskEntity();
-        repeatedTask.repeatDuringWeek = [1, 2, 3, 4];
+        repeatedTask.repeatDuringWeek = [1, 2, 3, 4, 5, 6, 7];
         repeatedTask.repeatDuringDay = [
           date.copyWith(hour: 11, minute: 5),
           date.copyWith(hour: 15, minute: 32),
@@ -60,8 +60,8 @@ void main() {
           categoryService: CategoryEntityService(db: db),
           repeatedTaskService: RepeatedTaskEntityService(db: db));
 
-      taskRepeatCheckerService =
-          TaskRepeatCheckerService(db: db, taskManager: taskCreationService);
+      taskRepeatCheckerService = TaskRepeatCheckerService(
+          db: db, taskManager: taskCreationService, today: DateTime.now());
     });
 
     tearDownAll(() async {

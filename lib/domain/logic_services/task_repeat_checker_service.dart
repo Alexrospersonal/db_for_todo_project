@@ -1,17 +1,8 @@
-// TODO: Service should find and build copies of repeated task
-//if is nesesary after first start application on day
-
 import 'package:db_for_todo_project/data/dtos/dtos_exports.dart';
 import 'package:db_for_todo_project/data/entities/entities_exports.dart';
 import 'package:db_for_todo_project/data/log_service.dart';
 import 'package:db_for_todo_project/domain/logic_services/logic_services_exports.dart';
 import 'package:isar/isar.dart';
-
-abstract interface class ITaskRepeatCheckerService<U> {
-  final U db;
-  ITaskRepeatCheckerService({required this.db});
-  Future<void> generateTodayTaskCopies();
-}
 
 class TaskCopyCreationData {
   final TaskEntity task;
@@ -22,17 +13,26 @@ class TaskCopyCreationData {
       {required this.task, required this.repeatedTask, required this.category});
 }
 
+abstract interface class ITaskRepeatCheckerService<U> {
+  final U db;
+  ITaskRepeatCheckerService({required this.db});
+  Future<void> generateTodayTaskCopies();
+}
+
 class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
   @override
   final Isar db;
   final TaskCreationService taskManager;
+  final DateTime today;
   final TaskDateManagerService dateManager = const TaskDateManagerService();
 
-  const TaskRepeatCheckerService({required this.db, required this.taskManager});
+  const TaskRepeatCheckerService(
+      {required this.db, required this.today, required this.taskManager});
 
   @override
   Future<void> generateTodayTaskCopies() async {
     var repeatedTasks = await fetchTodayRepeatingTasks();
+
     List<TaskCopyCreationData> repeatedTaskSaveDataList =
         await prepareTaskCopiesForToday(repeatedTasks);
 
@@ -40,7 +40,7 @@ class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
   }
 
   Future<List<RepeatedTaskEntity>> fetchTodayRepeatingTasks() async {
-    var weekday = DateTime.now().weekday;
+    var weekday = today.weekday;
 
     return await db.repeatedTaskEntitys
         .filter()
@@ -52,6 +52,7 @@ class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
   Future<List<TaskCopyCreationData>> prepareTaskCopiesForToday(
       List<RepeatedTaskEntity> repeatedTasks) async {
     List<TaskCopyCreationData> repeatedTaskSaveDataList = [];
+
     for (var repeatedTask in repeatedTasks) {
       await repeatedTask.task.load();
 
@@ -98,7 +99,7 @@ class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
   }
 
   Future<List<TaskEntity>> getCopiestTaskForToday(int taskId) async {
-    final DateTime now = DateTime.now();
+    final DateTime now = today;
     final DateTime lower = DateTime(now.year, now.month, now.day, 0, 0, 0);
     final DateTime upper = DateTime(now.year, now.month, now.day, 23, 59, 59);
 
@@ -107,6 +108,18 @@ class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
         .originalTask((q) => q.idEqualTo(taskId))
         .taskDateBetween(lower, upper)
         .findAll();
+  }
+
+  Future<void> buildCopiesOfTask(
+      List<TaskCopyCreationData> repeatedTaskSaveDataList) async {
+    await db.writeTxn(() async {
+      for (var saveData in repeatedTaskSaveDataList) {
+        await createAndSaveTaskCopies(
+            saveData.task, saveData.repeatedTask, saveData.category);
+        await markRepeatsAsCompleteIfEndingToday(saveData.repeatedTask);
+        //TODO: дадти сповіщення
+      }
+    });
   }
 
   Future<void> createAndSaveTaskCopies(TaskEntity task,
@@ -124,25 +137,13 @@ class TaskRepeatCheckerService implements ITaskRepeatCheckerService<Isar> {
 
   Future<void> markRepeatsAsCompleteIfEndingToday(
       RepeatedTaskEntity repeatedTask) async {
-    final DateTime now = DateTime.now();
-    final DateTime today = DateTime(now.year, now.month, now.day, 0, 0, 0);
+    final DateTime now = today;
+    final DateTime startOfDay = DateTime(now.year, now.month, now.day, 0, 0, 0);
 
     if (repeatedTask.endDateOfRepeatedly != null &&
-        repeatedTask.endDateOfRepeatedly == today) {
+        repeatedTask.endDateOfRepeatedly == startOfDay) {
       repeatedTask.isFinished = true;
       db.repeatedTaskEntitys.put(repeatedTask);
     }
-  }
-
-  Future<void> buildCopiesOfTask(
-      List<TaskCopyCreationData> repeatedTaskSaveDataList) async {
-    await db.writeTxn(() async {
-      for (var saveData in repeatedTaskSaveDataList) {
-        await createAndSaveTaskCopies(
-            saveData.task, saveData.repeatedTask, saveData.category);
-        await markRepeatsAsCompleteIfEndingToday(saveData.repeatedTask);
-        //TODO: дадти сповіщення
-      }
-    });
   }
 }
