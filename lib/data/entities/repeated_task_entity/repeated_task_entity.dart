@@ -20,11 +20,13 @@ class RepeatedTaskEntity {
   bool isFinished = false;
 
   Map<String, dynamic> toJson() {
+    var repeatDuringDayAsString = repeatDuringDay?.map((date) => date?.toIso8601String()).toList();
+
     return {
       "id": id,
       "repeatDuringWeek": repeatDuringWeek,
-      "endDateOfRepeatedly": endDateOfRepeatedly,
-      "repeatDuringDay": repeatDuringDay,
+      "endDateOfRepeatedly": endDateOfRepeatedly?.toIso8601String(),
+      "repeatDuringDay": repeatDuringDayAsString,
     };
   }
 }

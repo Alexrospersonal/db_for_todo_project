@@ -15,6 +15,7 @@ class TaskArchivationService implements ITaskArchivationService<Isar> {
   Isar db;
 
   var taskIdsForDeleting = <int>[];
+  var finishedTaskIdsForDeleting = <int>[];
   var repeatedTaskIdsForDeleting = <int>[];
   var archivedTaskList = <ArchivedTaskEntity>[];
 
@@ -22,10 +23,15 @@ class TaskArchivationService implements ITaskArchivationService<Isar> {
 
   @override
   Future<int> archiveTasks(int days) async {
-    var date = DateTime.now().subtract(Duration(days: days));
+    var now = DateTime.now();
+    var date = now.subtract(Duration(days: days));
 
     var finishedTasks = await retrieveFinishedTasks(date);
     var overdueTasks = await retrieveOverdueTasks(date);
+
+    if (finishedTasks.isEmpty && overdueTasks.isEmpty) {
+      return 0;
+    }
 
     await buildArchiveFromFinishedTasks(finishedTasks);
     await buildArchiveFromOverdueTasks(overdueTasks);
@@ -45,6 +51,8 @@ class TaskArchivationService implements ITaskArchivationService<Isar> {
 
   Future<void> buildArchiveFromFinishedTasks(List<FinishedTaskEntity> finishedTasks) async {
     for (var finishedTask in finishedTasks) {
+      finishedTaskIdsForDeleting.add(finishedTask.id);
+
       await finishedTask.task.load();
 
       validateTask(finishedTask.task.value);
@@ -121,5 +129,6 @@ class TaskArchivationService implements ITaskArchivationService<Isar> {
   Future<void> deleteFromEntities() async {
     await db.taskEntitys.deleteAll(taskIdsForDeleting);
     await db.repeatedTaskEntitys.deleteAll(repeatedTaskIdsForDeleting);
+    await db.finishedTaskEntitys.deleteAll(finishedTaskIdsForDeleting);
   }
 }
